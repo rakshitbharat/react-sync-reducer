@@ -1,6 +1,6 @@
 {
   "name": "react-use-reducer-wth-redux",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A React state management utility providing a useReducer-like hook with synchronous state access and selector support, powered by a factory function.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -83,6 +83,8 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "@types/jest": "^29.5.12",
     "@types/react": "^18.3.3",
     "@types/use-sync-external-store": "^0.0.6",
@@ -98,8 +100,6 @@
     "prettier": "^3.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/react-hooks": "^8.0.1",
     "rimraf": "^5.0.7",
     "ts-jest": "^29.1.4",
     "typescript": "~5.5.0",
