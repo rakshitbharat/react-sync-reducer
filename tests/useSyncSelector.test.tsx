@@ -193,30 +193,38 @@ describe('useSyncSelector Hook', () => {
     const refinedReducer: Reducer<UserState, UserAction> = (state, action) => {
         const timestamp = Date.now();
         switch (action.type) {
-          case 'LOGIN':
+          case 'LOGIN': {
             // Only return new object if user actually changes
             if(state.user?.id !== action.payload.id) {
                 return { ...state, user: action.payload, lastUpdate: timestamp };
             }
             return state; // Return same state if user is same
-          case 'LOGOUT':
+          }
+          case 'LOGOUT': {
             return state.user !== null ? { ...state, user: null, lastUpdate: timestamp } : state;
-          case 'SET_THEME':
-             if(state.settings.theme !== action.payload) {
-                return { ...state, settings: { ...state.settings, theme: action.payload }, lastUpdate: timestamp };
-             }
-             return state;
-          // ... other actions similarly refined ...
-          default:
-             const newState = userReducer(state, action); // Use original for other cases
-             return newState === state ? state : { ...newState, lastUpdate: timestamp }; // Ensure lastUpdate if changed
+          }
+          case 'SET_THEME': {
+            if(state.settings.theme !== action.payload) {
+               return { ...state, settings: { ...state.settings, theme: action.payload }, lastUpdate: timestamp };
+            }
+            return state;
+          }
+          default: {
+             const newState = userReducer(state, action);
+             return newState === state ? state : { ...newState, lastUpdate: timestamp };
+          }
         }
     };
-    store = createSyncStore(refinedReducer, userInitialState); // Use refined reducer
+    store = createSyncStore(refinedReducer, userInitialState);
 
     // Render again with the refined store
-    const { rerender } = render(
-        <SelectorComponent store={store} selector={settingsSelector} dataTestId="settings" onRender={renderSpy} />
+    render(
+        <SelectorComponent 
+          store={store} 
+          selector={settingsSelector} 
+          dataTestId="settings" 
+          onRender={renderSpy} 
+        />
     );
     renderSpy.mockClear(); // Reset spy after initial render
     expect(renderSpy).toHaveBeenCalledTimes(1);
