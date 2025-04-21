@@ -12,7 +12,7 @@
  *   count: number;
  * }
  *
- * type Action = 
+ * type Action =
  *   | { type: 'INCREMENT' }
  *   | { type: 'DECREMENT' };
  *

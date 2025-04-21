@@ -4,7 +4,7 @@ import { useSyncSelector } from './useSyncSelector';
 
 /**
  * Creates a new synchronized state store with Redux-like patterns and React hooks integration.
- * 
+ *
  * @example
  * ```typescript
  * // Define your state and action types
@@ -12,12 +12,12 @@ import { useSyncSelector } from './useSyncSelector';
  *   items: string[];
  *   loading: boolean;
  * }
- * 
- * type TodoAction = 
+ *
+ * type TodoAction =
  *   | { type: 'ADD_TODO'; payload: string }
  *   | { type: 'REMOVE_TODO'; payload: number }
  *   | { type: 'SET_LOADING'; payload: boolean };
- * 
+ *
  * // Create your reducer
  * const todoReducer: Reducer<TodoState, TodoAction> = (state, action) => {
  *   switch (action.type) {
@@ -34,24 +34,24 @@ import { useSyncSelector } from './useSyncSelector';
  *       return state;
  *   }
  * };
- * 
+ *
  * // Create the store
  * const todoStore = createSyncStore(todoReducer, {
  *   items: [],
  *   loading: false
  * });
- * 
+ *
  * // Use in components
  * function TodoList() {
  *   const [state, dispatch] = todoStore.useSyncReducer();
  *   const items = todoStore.useSyncSelector(s => s.items);
- *   
+ *
  *   return (
  *     <ul>
  *       {items.map((item, index) => (
  *         <li key={index}>
  *           {item}
- *           <button onClick={() => 
+ *           <button onClick={() =>
  *             dispatch({ type: 'REMOVE_TODO', payload: index })
  *           }>
  *             Delete
@@ -62,13 +62,13 @@ import { useSyncSelector } from './useSyncSelector';
  *   );
  * }
  * ```
- * 
+ *
  * @template S The type of the state managed by the store
  * @template A The type of the actions accepted by the reducer
- * 
+ *
  * @param reducer A pure function that returns the next state
  * @param initialState The initial state value
- * 
+ *
  * @returns A store instance with methods for state management and React hooks
  */
 export function createSyncStore<S, A>(

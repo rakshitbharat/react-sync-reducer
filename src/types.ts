@@ -2,12 +2,12 @@
  * A standard reducer function that processes actions and returns a new state.
  * @template S The type of the state.
  * @template A The type of the actions.
- * 
+ *
  * @example
  * ```typescript
  * type State = { count: number };
  * type Action = { type: 'INCREMENT' } | { type: 'DECREMENT' };
- * 
+ *
  * const reducer: Reducer<State, Action> = (state, action) => {
  *   switch (action.type) {
  *     case 'INCREMENT':
@@ -25,21 +25,21 @@ export type Reducer<S, A> = (state: S, action: A) => S;
 /**
  * A function to select and derive data from the state.
  * Use this to optimize renders by only subscribing to specific state changes.
- * 
+ *
  * @template S The type of the state.
  * @template Selected The type of the selected slice.
- * 
+ *
  * @example
  * ```typescript
  * interface State {
  *   user: { name: string; age: number };
  *   posts: Post[];
  * }
- * 
- * const selectUserName: Selector<State, string> = 
+ *
+ * const selectUserName: Selector<State, string> =
  *   (state) => state.user.name;
- * 
- * const selectPostCount: Selector<State, number> = 
+ *
+ * const selectPostCount: Selector<State, number> =
  *   (state) => state.posts.length;
  * ```
  */
@@ -48,17 +48,17 @@ export type Selector<S, Selected> = (state: S) => Selected;
 /**
  * A function to compare two values for equality.
  * Used to determine if a re-render is needed when using selectors.
- * 
+ *
  * @template Selected The type of the values being compared.
- * 
+ *
  * @example
  * ```typescript
  * // Custom equality function for arrays
- * const arrayEquals: EqualityFn<number[]> = (a, b) => 
+ * const arrayEquals: EqualityFn<number[]> = (a, b) =>
  *   a.length === b.length && a.every((v, i) => v === b[i]);
- * 
+ *
  * // Deep equality for objects
- * const deepEquals: EqualityFn<object> = (a, b) => 
+ * const deepEquals: EqualityFn<object> = (a, b) =>
  *   JSON.stringify(a) === JSON.stringify(b);
  * ```
  */

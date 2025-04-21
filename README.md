@@ -32,7 +32,7 @@ import { createSyncStore } from 'react-use-reducer-wth-redux';
 
 // Define your state and action types
 type State = { count: number };
-type Action = 
+type Action =
   | { type: 'INCREMENT' }
   | { type: 'DECREMENT' }
   | { type: 'SET'; payload: number };
@@ -58,7 +58,8 @@ export const counterStore = createSyncStore(reducer, initialState);
 
 // Optional: Create custom hooks for this store
 export const useCounter = counterStore.useSyncReducer;
-export const useCountValue = () => counterStore.useSyncSelector(state => state.count);
+export const useCountValue = () =>
+  counterStore.useSyncSelector((state) => state.count);
 ```
 
 ### Using in Components
@@ -71,13 +72,15 @@ import { counterStore, useCounter, useCountValue } from '../store/counterStore';
 // Component using full state and dispatch
 const CounterControls = () => {
   const [state, dispatch] = useCounter();
-  
+
   return (
     <div>
       <p>Count: {state.count}</p>
       <button onClick={() => dispatch({ type: 'INCREMENT' })}>+</button>
       <button onClick={() => dispatch({ type: 'DECREMENT' })}>-</button>
-      <button onClick={() => dispatch({ type: 'SET', payload: 0 })}>Reset</button>
+      <button onClick={() => dispatch({ type: 'SET', payload: 0 })}>
+        Reset
+      </button>
     </div>
   );
 };
@@ -154,7 +157,7 @@ const UserSettings = () => {
     state => state.settings,
     areSettingsEqual // Optional equality function
   );
-  
+
   return (
     <div>
       <h3>Settings</h3>
@@ -173,8 +176,12 @@ The package is written in TypeScript and provides full type safety:
 import { createSyncStore, type Reducer } from 'react-use-reducer-wth-redux';
 
 // Your types
-type State = { /* ... */ };
-type Action = { /* ... */ };
+type State = {
+  /* ... */
+};
+type Action = {
+  /* ... */
+};
 
 // Fully typed reducer
 const reducer: Reducer<State, Action> = (state, action) => {

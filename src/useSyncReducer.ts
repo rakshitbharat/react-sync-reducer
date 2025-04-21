@@ -15,7 +15,7 @@ import { useCallback } from 'react';
  *   lastUpdated: string;
  * }
  *
- * type Action = 
+ * type Action =
  *   | { type: 'INCREMENT' }
  *   | { type: 'DECREMENT' }
  *   | { type: 'RESET' };
