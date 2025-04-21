@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Run all checks in sequence
+      - name: Run all checks
+        run: yarn check:all
+
+      # If any check fails, we still want to see the specific error
+      - name: Lint check (if main check fails)
+        if: failure()
+        run: yarn check:lint
+
+      - name: Format check (if main check fails)
+        if: failure()
+        run: yarn check:format
+
+      - name: Type check (if main check fails)
+        if: failure()
+        run: yarn check:types
+
+      - name: Test with coverage (if main check fails)
+        if: failure()
+        run: yarn check:test
+
+      # Always run build to ensure it works
+      - name: Build
+        run: yarn build
+
+      # Upload coverage reports if tests pass
+      - name: Upload coverage reports
+        if: success()
+        uses: codecov/codecov-action@v3
