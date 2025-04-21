@@ -61,7 +61,7 @@ export const myService = {
     if (store.getState().count > 10) {
       // Do something
     }
-  }
+  },
 };
 
 // In async functions
@@ -107,7 +107,7 @@ function CounterWithUseReducer() {
     dispatch({ type: 'INCREMENT' });
     // 😕 state.count is still the old value
     console.log(state.count); // Logs old value
-    
+
     // Common workarounds:
     // 1. Use useEffect (adds complexity)
     // 2. Use refs (harder to maintain)
@@ -145,7 +145,7 @@ function CounterWithSyncStore() {
     dispatch({ type: 'INCREMENT' });
     // ✅ Get updated state immediately!
     console.log(counterStore.getState().count); // Logs new value
-    
+
     // Can use the new state right away
     if (counterStore.getState().count === 10) {
       showCelebration();
@@ -389,7 +389,7 @@ Creates a new store instance with the following methods:
 // Before (with React's useReducer)
 const MyComponent = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  
+
   const handleAction = async () => {
     dispatch({ type: 'START_LOADING' });
     // ❌ state.loading is still false here
@@ -403,7 +403,7 @@ const store = createSyncStore(reducer, initialState);
 
 const MyComponent = () => {
   const [state, dispatch] = store.useSyncReducer();
-  
+
   const handleAction = async () => {
     dispatch({ type: 'START_LOADING' });
     // ✅ Can check loading state immediately
