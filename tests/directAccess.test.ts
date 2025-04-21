@@ -3,7 +3,7 @@ import { createSyncStore } from '../src/createSyncStore';
 describe('Direct State Access', () => {
   test('should provide immediate state access after dispatch', () => {
     const store = createSyncStore(
-      (state: number, action: 'INCREMENT') => state + 1,
+      (_state: number, _action: 'INCREMENT') => _state + 1, // Add underscore prefix
       0
     );
 

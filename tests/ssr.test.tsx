@@ -1,4 +1,3 @@
-import { renderToString } from 'react-dom/server';
 import { createSyncStore } from '../src/createSyncStore';
 import { renderHook } from '@testing-library/react';
 
@@ -6,7 +5,7 @@ describe('SSR Support', () => {
   test('should provide initial state during SSR', () => {
     const initialState = { count: 5 };
     const store = createSyncStore(
-      (state, action: 'INCREMENT') => ({ count: state.count + 1 }),
+      (state, _action: 'INCREMENT') => ({ count: state.count + 1 }),
       initialState
     );
 
