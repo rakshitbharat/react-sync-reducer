@@ -3,43 +3,73 @@ import { useSyncReducer } from './useSyncReducer';
 import { useSyncSelector } from './useSyncSelector';
 
 /**
- * Creates a new synchronized state store instance based on a reducer.
- *
- * This factory function encapsulates the state, reducer, and listeners,
- * allowing for multiple independent stores within an application. It provides
- * methods for synchronous state access, dispatching actions, subscribing to
- * changes, and React hooks for component integration.
- *
- * @template S The type of the state managed by the store.
- * @template A The type of the actions accepted by the reducer.
- *
- * @param {Reducer<S, A>} reducer The reducer function that handles state transitions.
- * @param {S} initialState The initial state of the store.
- *
- * @returns {SyncStore<S, A>} An object containing methods and hooks to interact with the store.
- *
+ * Creates a new synchronized state store with Redux-like patterns and React hooks integration.
+ * 
  * @example
- * type State = { count: number };
- * type Action = { type: 'INCREMENT' } | { type: 'DECREMENT' };
- * const initialState: State = { count: 0 };
- * function reducer(state: State, action: Action): State {
- *   // ... reducer logic
+ * ```typescript
+ * // Define your state and action types
+ * interface TodoState {
+ *   items: string[];
+ *   loading: boolean;
  * }
- *
- * const counterStore = createSyncStore(reducer, initialState);
- *
- * // Accessing state synchronously
- * const currentState = counterStore.getState();
- *
- * // Dispatching an action
- * counterStore.dispatch({ type: 'INCREMENT' });
- *
- * // Using hooks in React components
- * const MyComponent = () => {
- *   const [state, dispatch] = counterStore.useSyncReducer();
- *   const count = counterStore.useSyncSelector(s => s.count);
- *   // ...
+ * 
+ * type TodoAction = 
+ *   | { type: 'ADD_TODO'; payload: string }
+ *   | { type: 'REMOVE_TODO'; payload: number }
+ *   | { type: 'SET_LOADING'; payload: boolean };
+ * 
+ * // Create your reducer
+ * const todoReducer: Reducer<TodoState, TodoAction> = (state, action) => {
+ *   switch (action.type) {
+ *     case 'ADD_TODO':
+ *       return { ...state, items: [...state.items, action.payload] };
+ *     case 'REMOVE_TODO':
+ *       return {
+ *         ...state,
+ *         items: state.items.filter((_, i) => i !== action.payload)
+ *       };
+ *     case 'SET_LOADING':
+ *       return { ...state, loading: action.payload };
+ *     default:
+ *       return state;
+ *   }
+ * };
+ * 
+ * // Create the store
+ * const todoStore = createSyncStore(todoReducer, {
+ *   items: [],
+ *   loading: false
+ * });
+ * 
+ * // Use in components
+ * function TodoList() {
+ *   const [state, dispatch] = todoStore.useSyncReducer();
+ *   const items = todoStore.useSyncSelector(s => s.items);
+ *   
+ *   return (
+ *     <ul>
+ *       {items.map((item, index) => (
+ *         <li key={index}>
+ *           {item}
+ *           <button onClick={() => 
+ *             dispatch({ type: 'REMOVE_TODO', payload: index })
+ *           }>
+ *             Delete
+ *           </button>
+ *         </li>
+ *       ))}
+ *     </ul>
+ *   );
  * }
+ * ```
+ * 
+ * @template S The type of the state managed by the store
+ * @template A The type of the actions accepted by the reducer
+ * 
+ * @param reducer A pure function that returns the next state
+ * @param initialState The initial state value
+ * 
+ * @returns A store instance with methods for state management and React hooks
  */
 export function createSyncStore<S, A>(
   reducer: Reducer<S, A>,

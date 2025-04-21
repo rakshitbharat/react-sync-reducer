@@ -1,30 +1,66 @@
 /**
- * A standard reducer function signature.
+ * A standard reducer function that processes actions and returns a new state.
  * @template S The type of the state.
  * @template A The type of the actions.
- * @param state The current state.
- * @param action The action to process.
- * @returns The new state.
+ * 
+ * @example
+ * ```typescript
+ * type State = { count: number };
+ * type Action = { type: 'INCREMENT' } | { type: 'DECREMENT' };
+ * 
+ * const reducer: Reducer<State, Action> = (state, action) => {
+ *   switch (action.type) {
+ *     case 'INCREMENT':
+ *       return { count: state.count + 1 };
+ *     case 'DECREMENT':
+ *       return { count: state.count - 1 };
+ *     default:
+ *       return state;
+ *   }
+ * };
+ * ```
  */
 export type Reducer<S, A> = (state: S, action: A) => S;
 
 /**
- * A function to select a slice of state.
+ * A function to select and derive data from the state.
+ * Use this to optimize renders by only subscribing to specific state changes.
+ * 
  * @template S The type of the state.
  * @template Selected The type of the selected slice.
- * @param state The current state.
- * @returns The selected slice of state.
+ * 
+ * @example
+ * ```typescript
+ * interface State {
+ *   user: { name: string; age: number };
+ *   posts: Post[];
+ * }
+ * 
+ * const selectUserName: Selector<State, string> = 
+ *   (state) => state.user.name;
+ * 
+ * const selectPostCount: Selector<State, number> = 
+ *   (state) => state.posts.length;
+ * ```
  */
 export type Selector<S, Selected> = (state: S) => Selected;
 
 /**
  * A function to compare two values for equality.
- * Used by useSyncSelector to determine if a re-render is needed.
- * Defaults to Object.is.
+ * Used to determine if a re-render is needed when using selectors.
+ * 
  * @template Selected The type of the values being compared.
- * @param a The first value.
- * @param b The second value.
- * @returns True if the values are considered equal, false otherwise.
+ * 
+ * @example
+ * ```typescript
+ * // Custom equality function for arrays
+ * const arrayEquals: EqualityFn<number[]> = (a, b) => 
+ *   a.length === b.length && a.every((v, i) => v === b[i]);
+ * 
+ * // Deep equality for objects
+ * const deepEquals: EqualityFn<object> = (a, b) => 
+ *   JSON.stringify(a) === JSON.stringify(b);
+ * ```
  */
 export type EqualityFn<Selected> = (a: Selected, b: Selected) => boolean;
 
