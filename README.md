@@ -5,6 +5,88 @@
 
 A synchronous state management solution for React that addresses the limitations of `useReducer`.
 
+## 🏃‍♂️ Quick Migration from useReducer
+
+### Step 1: Replace useReducer with createSyncStore
+
+```typescript
+// Before: Your existing reducer code
+const initialState = { count: 0 };
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    default:
+      return state;
+  }
+};
+
+// After: Just wrap it with createSyncStore
+import { createSyncStore } from 'react-use-reducer-wth-redux';
+export const store = createSyncStore(reducer, initialState);
+
+// That's it! Now you can access your state anywhere:
+console.log(store.getState()); // Get state anywhere
+store.dispatch({ type: 'INCREMENT' }); // Dispatch anywhere
+```
+
+### Step 2: Update Your Components
+
+```typescript
+// Before: Component with useReducer
+const Counter = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return <button onClick={() => dispatch({ type: 'INCREMENT' })}>{state.count}</button>;
+};
+
+// After: Just change the import and hook
+const Counter = () => {
+  const [state, dispatch] = store.useSyncReducer();
+  return <button onClick={() => dispatch({ type: 'INCREMENT' })}>{state.count}</button>;
+};
+```
+
+### Step 3: Access State Anywhere (The Main Benefit!)
+
+```typescript
+// In event handlers - get state immediately after dispatch
+const handleClick = () => {
+  store.dispatch({ type: 'INCREMENT' });
+  console.log(store.getState().count); // ✅ Updated value!
+};
+
+// In services/utils
+export const myService = {
+  doSomething: () => {
+    if (store.getState().count > 10) {
+      // Do something
+    }
+  }
+};
+
+// In async functions
+async function fetchData() {
+  store.dispatch({ type: 'SET_LOADING', payload: true });
+  try {
+    const data = await api.get('/data');
+    // ✅ Check loading state immediately
+    if (store.getState().loading) {
+      store.dispatch({ type: 'SET_DATA', payload: data });
+    }
+  } catch (error) {
+    store.dispatch({ type: 'SET_ERROR', payload: error });
+  }
+}
+```
+
+### Quick Tips
+
+- **Direct State Access**: Use `store.getState()` anywhere
+- **Global Updates**: Use `store.dispatch()` from any file
+- **Component Updates**: Use `store.useSyncReducer()` in components
+- **Optimized Renders**: Use `store.useSyncSelector(state => state.someField)`
+- **Testing**: Reset store with `store.reset()`
+
 ## 🤔 The Problem
 
 With React's built-in `useReducer`, you can't access the updated state immediately after dispatching:
