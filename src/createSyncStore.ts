@@ -101,7 +101,8 @@ export function createSyncStore<S, A>(
   const useSelectorState = <Selected>(
     selector: (state: S) => Selected,
     equalityFn?: (a: Selected, b: Selected) => boolean
-  ) => useSyncSelector(subscribe, getState, getServerState, selector, equalityFn);
+  ) =>
+    useSyncSelector(subscribe, getState, getServerState, selector, equalityFn);
 
   return {
     getState,
