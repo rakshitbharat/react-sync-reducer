@@ -60,27 +60,28 @@ const userReducer: Reducer<UserState, UserAction> = (state, action) => {
 // --- Test Components ---
 
 interface SelectorComponentProps<Selected> {
-    store: ReturnType<typeof createSyncStore<UserState, UserAction>>;
-    selector: (state: UserState) => Selected;
-    equalityFn?: (a: Selected, b: Selected) => boolean;
-    dataTestId: string;
-    onRender?: () => void;
-  }
+  store: ReturnType<typeof createSyncStore<UserState, UserAction>>;
+  selector: (state: UserState) => Selected;
+  equalityFn?: (a: Selected, b: Selected) => boolean;
+  dataTestId: string;
+  onRender?: () => void;
+}
 
 const SelectorComponent = <Selected,>({
-    store,
-    selector,
-    equalityFn,
-    dataTestId,
-    onRender,
+  store,
+  selector,
+  equalityFn,
+  dataTestId,
+  onRender,
 }: SelectorComponentProps<Selected>) => {
   const selectedState = store.useSyncSelector(selector, equalityFn);
   onRender?.();
 
   // Displaying the selected state (handling objects for display)
-  const displayValue = typeof selectedState === 'object'
-    ? JSON.stringify(selectedState)
-    : String(selectedState);
+  const displayValue =
+    typeof selectedState === 'object'
+      ? JSON.stringify(selectedState)
+      : String(selectedState);
 
   return <div data-testid={dataTestId}>{displayValue}</div>;
 };
@@ -140,14 +141,14 @@ describe('useSyncSelector Hook', () => {
 
     // Dispatch action that changes *other* state (notifications), but not the selected theme
     act(() => {
-        store.dispatch({ type: 'TOGGLE_NOTIFICATIONS' });
+      store.dispatch({ type: 'TOGGLE_NOTIFICATIONS' });
     });
     expect(screen.getByTestId('theme').textContent).toBe('dark'); // Value is the same
     expect(renderSpy).toHaveBeenCalledTimes(2); // Should *not* re-render again
 
-     // Dispatch action that changes *other* state (login)
-     act(() => {
-        store.dispatch({ type: 'LOGIN', payload: { id: 1, name: 'Test User'} });
+    // Dispatch action that changes *other* state (login)
+    act(() => {
+      store.dispatch({ type: 'LOGIN', payload: { id: 1, name: 'Test User' } });
     });
     expect(screen.getByTestId('theme').textContent).toBe('dark');
     expect(renderSpy).toHaveBeenCalledTimes(2); // Should *not* re-render again
@@ -183,7 +184,7 @@ describe('useSyncSelector Hook', () => {
     // However, our reducer *always* creates a new state object, which means settings ref *might* change depending on how it's structured
     // Let's test the user action which *doesn't* touch settings directly
     act(() => {
-      store.dispatch({ type: 'LOGIN', payload: { id: 1, name: 'Test' }});
+      store.dispatch({ type: 'LOGIN', payload: { id: 1, name: 'Test' } });
     });
     // Check if it re-rendered unnecessarily. useSyncExternalStoreWithSelector's default equality (Object.is)
     // should prevent re-render if the selector returns the same object reference.
@@ -191,64 +192,74 @@ describe('useSyncSelector Hook', () => {
     // but if `state.settings` reference hasn't changed, it should not re-render.
     // Let's refine the reducer for this case:
     const refinedReducer: Reducer<UserState, UserAction> = (state, action) => {
-        const timestamp = Date.now();
-        switch (action.type) {
-          case 'LOGIN': {
-            // Only return new object if user actually changes
-            if(state.user?.id !== action.payload.id) {
-                return { ...state, user: action.payload, lastUpdate: timestamp };
-            }
-            return state; // Return same state if user is same
+      const timestamp = Date.now();
+      switch (action.type) {
+        case 'LOGIN': {
+          // Only return new object if user actually changes
+          if (state.user?.id !== action.payload.id) {
+            return { ...state, user: action.payload, lastUpdate: timestamp };
           }
-          case 'LOGOUT': {
-            return state.user !== null ? { ...state, user: null, lastUpdate: timestamp } : state;
-          }
-          case 'SET_THEME': {
-            if(state.settings.theme !== action.payload) {
-               return { ...state, settings: { ...state.settings, theme: action.payload }, lastUpdate: timestamp };
-            }
-            return state;
-          }
-          default: {
-             const newState = userReducer(state, action);
-             return newState === state ? state : { ...newState, lastUpdate: timestamp };
-          }
+          return state; // Return same state if user is same
         }
+        case 'LOGOUT': {
+          return state.user !== null
+            ? { ...state, user: null, lastUpdate: timestamp }
+            : state;
+        }
+        case 'SET_THEME': {
+          if (state.settings.theme !== action.payload) {
+            return {
+              ...state,
+              settings: { ...state.settings, theme: action.payload },
+              lastUpdate: timestamp,
+            };
+          }
+          return state;
+        }
+        default: {
+          const newState = userReducer(state, action);
+          return newState === state
+            ? state
+            : { ...newState, lastUpdate: timestamp };
+        }
+      }
     };
     store = createSyncStore(refinedReducer, userInitialState);
 
     // Render again with the refined store
     render(
-        <SelectorComponent 
-          store={store} 
-          selector={settingsSelector} 
-          dataTestId="settings" 
-          onRender={renderSpy} 
-        />
+      <SelectorComponent
+        store={store}
+        selector={settingsSelector}
+        dataTestId="settings"
+        onRender={renderSpy}
+      />
     );
     renderSpy.mockClear(); // Reset spy after initial render
     expect(renderSpy).toHaveBeenCalledTimes(1);
 
     // Dispatch login - this shouldn't change settings ref
     act(() => {
-      store.dispatch({ type: 'LOGIN', payload: { id: 1, name: 'Test' }});
+      store.dispatch({ type: 'LOGIN', payload: { id: 1, name: 'Test' } });
     });
     expect(renderSpy).toHaveBeenCalledTimes(1); // Should NOT re-render settings component
 
-     // Dispatch set theme - this SHOULD change settings ref
-     act(() => {
-        store.dispatch({ type: 'SET_THEME', payload: 'dark' });
-      });
-      expect(renderSpy).toHaveBeenCalledTimes(2); // Should re-render settings component
-
+    // Dispatch set theme - this SHOULD change settings ref
+    act(() => {
+      store.dispatch({ type: 'SET_THEME', payload: 'dark' });
+    });
+    expect(renderSpy).toHaveBeenCalledTimes(2); // Should re-render settings component
   });
 
   it('should use custom equality function correctly', () => {
     const renderSpy = jest.fn();
     // Selector returns an object, but we only care if the theme property changes
-    const themeSelector = (state: UserState) => ({ theme: state.settings.theme });
+    const themeSelector = (state: UserState) => ({
+      theme: state.settings.theme,
+    });
     // Custom equality: only re-render if theme string is different
-    const themeEqualityFn = (a: { theme: string }, b: { theme: string }) => a.theme === b.theme;
+    const themeEqualityFn = (a: { theme: string }, b: { theme: string }) =>
+      a.theme === b.theme;
 
     render(
       <SelectorComponent
@@ -260,25 +271,30 @@ describe('useSyncSelector Hook', () => {
       />
     );
     expect(renderSpy).toHaveBeenCalledTimes(1); // Initial render
-    expect(screen.getByTestId('custom-eq').textContent).toBe(JSON.stringify({ theme: 'light' }));
+    expect(screen.getByTestId('custom-eq').textContent).toBe(
+      JSON.stringify({ theme: 'light' })
+    );
 
     // Dispatch action that changes the theme
     act(() => {
       store.dispatch({ type: 'SET_THEME', payload: 'dark' });
     });
-    expect(screen.getByTestId('custom-eq').textContent).toBe(JSON.stringify({ theme: 'dark' }));
+    expect(screen.getByTestId('custom-eq').textContent).toBe(
+      JSON.stringify({ theme: 'dark' })
+    );
     expect(renderSpy).toHaveBeenCalledTimes(2); // Re-rendered because theme changed
 
     // Dispatch action that changes notifications but NOT theme
     act(() => {
-        store.dispatch({ type: 'TOGGLE_NOTIFICATIONS' });
+      store.dispatch({ type: 'TOGGLE_NOTIFICATIONS' });
     });
     // The selector will return a *new object* { theme: 'dark' } because the root state changed,
     // but the custom equality function should see the 'theme' property is the same ('dark' === 'dark')
     // and prevent a re-render.
-    expect(screen.getByTestId('custom-eq').textContent).toBe(JSON.stringify({ theme: 'dark' }));
+    expect(screen.getByTestId('custom-eq').textContent).toBe(
+      JSON.stringify({ theme: 'dark' })
+    );
     expect(renderSpy).toHaveBeenCalledTimes(2); // Should *not* re-render again due to custom equalityFn
-
   });
 
   it('should select derived data correctly', () => {
@@ -299,21 +315,21 @@ describe('useSyncSelector Hook', () => {
 
     // Log in
     act(() => {
-        store.dispatch({ type: 'LOGIN', payload: { id: 1, name: 'User' }});
+      store.dispatch({ type: 'LOGIN', payload: { id: 1, name: 'User' } });
     });
     expect(screen.getByTestId('is-logged-in').textContent).toBe('true');
     expect(renderSpy).toHaveBeenCalledTimes(2); // Re-rendered
 
     // Change theme (should not affect isLoggedIn)
     act(() => {
-        store.dispatch({ type: 'SET_THEME', payload: 'dark' });
+      store.dispatch({ type: 'SET_THEME', payload: 'dark' });
     });
     expect(screen.getByTestId('is-logged-in').textContent).toBe('true');
     expect(renderSpy).toHaveBeenCalledTimes(2); // Should not re-render
 
     // Log out
     act(() => {
-        store.dispatch({ type: 'LOGOUT' });
+      store.dispatch({ type: 'LOGOUT' });
     });
     expect(screen.getByTestId('is-logged-in').textContent).toBe('false');
     expect(renderSpy).toHaveBeenCalledTimes(3); // Re-rendered

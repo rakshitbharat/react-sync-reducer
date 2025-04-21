@@ -7,11 +7,11 @@ A React state management utility providing a `useReducer`-like hook with synchro
 
 ## Features
 
-*   **Reducer Logic:** Manage state updates using familiar reducer functions.
-*   **Synchronous Access:** Get the latest state immediately after dispatch using `store.getState()`.
-*   **React Integration:** Hooks (`useSyncReducer`, `useSyncSelector`) powered by `useSyncExternalStore` for optimal React 18+ compatibility.
-*   **Isolated Stores:** Create multiple independent state stores using the `createSyncStore` factory.
-*   **Selector Support:** Efficiently subscribe to specific state slices or derived data using `useSyncSelector`.
-*   **TypeScript:** Fully typed for a better developer experience.
+- **Reducer Logic:** Manage state updates using familiar reducer functions.
+- **Synchronous Access:** Get the latest state immediately after dispatch using `store.getState()`.
+- **React Integration:** Hooks (`useSyncReducer`, `useSyncSelector`) powered by `useSyncExternalStore` for optimal React 18+ compatibility.
+- **Isolated Stores:** Create multiple independent state stores using the `createSyncStore` factory.
+- **Selector Support:** Efficiently subscribe to specific state slices or derived data using `useSyncSelector`.
+- **TypeScript:** Fully typed for a better developer experience.
 
 ## Installation

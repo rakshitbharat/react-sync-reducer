@@ -47,10 +47,13 @@ describe('createSyncStore', () => {
   });
 
   it('should not update state if reducer returns the same state object', () => {
-    const identicalStateReducer: Reducer<TestState, TestAction> = (state, _action) => {
-        // Always return the exact same object reference
-        return state;
-    }
+    const identicalStateReducer: Reducer<TestState, TestAction> = (
+      state,
+      _action
+    ) => {
+      // Always return the exact same object reference
+      return state;
+    };
     const store = createSyncStore(identicalStateReducer, initialState);
     const listener = jest.fn();
     store.subscribe(listener);
@@ -127,33 +130,35 @@ describe('createSyncStore', () => {
     // Check that state remains unchanged
     expect(store.getState()).toBe(originalState);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error occurred during dispatch or in reducer:',
-        expect.any(Error)
-      );
+      'Error occurred during dispatch or in reducer:',
+      expect.any(Error)
+    );
 
     consoleErrorSpy.mockRestore();
   });
 
-    it('should reset the store to initial state and clear listeners', () => {
-        const store = createSyncStore(reducer, initialState);
-        const listener = jest.fn();
-        store.subscribe(listener);
+  it('should reset the store to initial state and clear listeners', () => {
+    const store = createSyncStore(reducer, initialState);
+    const listener = jest.fn();
+    store.subscribe(listener);
 
-        store.dispatch({ type: 'INCREMENT' });
-        store.dispatch({ type: 'SET_MESSAGE', payload: 'test' });
-        expect(store.getState()).toEqual({ count: 1, message: 'test' });
+    store.dispatch({ type: 'INCREMENT' });
+    store.dispatch({ type: 'SET_MESSAGE', payload: 'test' });
+    expect(store.getState()).toEqual({ count: 1, message: 'test' });
 
-        const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-        store.reset();
-        expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('SyncStore reset'));
+    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    store.reset();
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('SyncStore reset')
+    );
 
-        expect(store.getState()).toEqual(initialState);
+    expect(store.getState()).toEqual(initialState);
 
-        // Dispatch again after reset, listener should not be called as it was cleared
-        store.dispatch({ type: 'INCREMENT' });
-        expect(listener).not.toHaveBeenCalled();
-        expect(store.getState()).toEqual({ count: 1 }); // State updates correctly after reset
+    // Dispatch again after reset, listener should not be called as it was cleared
+    store.dispatch({ type: 'INCREMENT' });
+    expect(listener).not.toHaveBeenCalled();
+    expect(store.getState()).toEqual({ count: 1 }); // State updates correctly after reset
 
-        consoleWarnSpy.mockRestore();
-    });
+    consoleWarnSpy.mockRestore();
+  });
 });

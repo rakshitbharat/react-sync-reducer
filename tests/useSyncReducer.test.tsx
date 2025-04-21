@@ -7,31 +7,37 @@ import { Reducer } from '../src/types';
 type CounterState = { count: number };
 type CounterAction = { type: 'INC' } | { type: 'DEC' };
 const counterInitialState: CounterState = { count: 0 };
-const counterReducer: Reducer<CounterState, CounterAction> = (state, action) => {
+const counterReducer: Reducer<CounterState, CounterAction> = (
+  state,
+  action
+) => {
   switch (action.type) {
-    case 'INC': return { count: state.count + 1 };
-    case 'DEC': return { count: state.count - 1 };
-    default: return state;
+    case 'INC':
+      return { count: state.count + 1 };
+    case 'DEC':
+      return { count: state.count - 1 };
+    default:
+      return state;
   }
 };
 
 // --- Test Component ---
 interface TestComponentProps {
-    store: ReturnType<typeof createSyncStore<CounterState, CounterAction>>;
-    onRender?: () => void;
-  }
+  store: ReturnType<typeof createSyncStore<CounterState, CounterAction>>;
+  onRender?: () => void;
+}
 
 const TestComponent: React.FC<TestComponentProps> = ({ store, onRender }) => {
-    const [state, dispatch] = store.useSyncReducer();
-    onRender?.(); // Callback to track renders
+  const [state, dispatch] = store.useSyncReducer();
+  onRender?.(); // Callback to track renders
 
-    return (
-      <div>
-        <span data-testid="count">{state.count}</span>
-        <button onClick={() => dispatch({ type: 'INC' })}>Increment</button>
-        <button onClick={() => dispatch({ type: 'DEC' })}>Decrement</button>
-      </div>
-    );
+  return (
+    <div>
+      <span data-testid="count">{state.count}</span>
+      <button onClick={() => dispatch({ type: 'INC' })}>Increment</button>
+      <button onClick={() => dispatch({ type: 'DEC' })}>Decrement</button>
+    </div>
+  );
 };
 
 // --- Tests ---
@@ -71,7 +77,6 @@ describe('useSyncReducer Hook', () => {
     expect(screen.getByTestId('count').textContent).toBe('2');
     expect(store.getState().count).toBe(2);
 
-
     act(() => {
       screen.getByText('Decrement').click();
     });
@@ -83,11 +88,13 @@ describe('useSyncReducer Hook', () => {
     const dispatchInstances = new Set<(action: CounterAction) => void>();
     let capturedDispatch: ((action: CounterAction) => void) | null = null;
 
-    const CaptureDispatchComponent: React.FC<{ store: typeof store }> = ({ store }) => {
-        const [, dispatch] = store.useSyncReducer();
-        dispatchInstances.add(dispatch);
-        capturedDispatch = dispatch; // Capture the latest dispatch instance
-        return null; // No UI needed
+    const CaptureDispatchComponent: React.FC<{ store: typeof store }> = ({
+      store,
+    }) => {
+      const [, dispatch] = store.useSyncReducer();
+      dispatchInstances.add(dispatch);
+      capturedDispatch = dispatch; // Capture the latest dispatch instance
+      return null; // No UI needed
     };
 
     const { rerender } = render(<CaptureDispatchComponent store={store} />);
@@ -123,23 +130,23 @@ describe('useSyncReducer Hook', () => {
 
     // Dispatch again
     act(() => {
-        store.dispatch({ type: 'DEC' });
-      });
+      store.dispatch({ type: 'DEC' });
+    });
     expect(screen.getByTestId('count').textContent).toBe('0');
     expect(renderSpy).toHaveBeenCalledTimes(3);
   });
 
   it('should use getServerState for initial render (simulated SSR)', () => {
-        const serverState: CounterState = { count: 99 };
-        const ssrStore = createSyncStore(counterReducer, serverState);
+    const serverState: CounterState = { count: 99 };
+    const ssrStore = createSyncStore(counterReducer, serverState);
 
-        // In a real SSR scenario, useSyncExternalStore would use getServerState initially.
-        // Here, we verify the hook reads the initial state provided via getServerState.
-        const Comp: React.FC = () => {
-            const [state] = ssrStore.useSyncReducer();
-            return <div data-testid="ssr-count">{state.count}</div>;
-        }
-        render(<Comp />);
-        expect(screen.getByTestId('ssr-count').textContent).toBe('99');
+    // In a real SSR scenario, useSyncExternalStore would use getServerState initially.
+    // Here, we verify the hook reads the initial state provided via getServerState.
+    const Comp: React.FC = () => {
+      const [state] = ssrStore.useSyncReducer();
+      return <div data-testid="ssr-count">{state.count}</div>;
+    };
+    render(<Comp />);
+    expect(screen.getByTestId('ssr-count').textContent).toBe('99');
   });
 });
