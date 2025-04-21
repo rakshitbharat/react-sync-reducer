@@ -50,41 +50,65 @@ describe('useSyncSelector', () => {
   test('should respect equality function', () => {
     const store = createSyncStore(reducer, initialState);
     const renderCount = jest.fn();
+    const customEqualityFn = jest.fn((a, b) => a.theme === b.theme);
 
-    const { rerender } = renderHook(() => {
+    // Setup the hook with equality function
+    renderHook(() => {
       renderCount();
-      return store.useSyncSelector(
-        (state) => state.settings,
-        (a, b) => a.theme === b.theme
-      );
+      return store.useSyncSelector((state) => state.settings, customEqualityFn);
     });
 
-    const initialCalls = renderCount.mock.calls.length;
+    // Clear initial render count
+    renderCount.mockClear();
+    customEqualityFn.mockClear();
 
+    // Dispatch an action that doesn't change the selected value
     act(() => {
       store.dispatch({ type: 'UPDATE_NAME', payload: 'Jane' });
     });
 
-    rerender();
+    // Should not trigger a re-render since settings didn't change
+    expect(renderCount).not.toHaveBeenCalled();
+    expect(customEqualityFn).toHaveBeenCalled();
 
-    // Should not re-render when unrelated state changes
-    expect(renderCount).toHaveBeenCalledTimes(initialCalls);
+    // Now dispatch an action that changes the selected value
+    act(() => {
+      store.dispatch({ type: 'UPDATE_THEME', payload: 'dark' });
+    });
+
+    // Should trigger a re-render since theme changed
+    expect(renderCount).toHaveBeenCalledTimes(1);
   });
 
   test('should use default equality function', () => {
     const store = createSyncStore(reducer, initialState);
+    const renderCount = jest.fn();
 
-    const { result } = renderHook(() =>
-      store.useSyncSelector((state) => state.settings)
-    );
+    // Setup the hook without custom equality function
+    const { result } = renderHook(() => {
+      renderCount();
+      return store.useSyncSelector((state) => state.settings);
+    });
 
-    const initialResult = result.current;
+    const initialSettings = result.current;
+    renderCount.mockClear();
 
+    // Dispatch an action that doesn't change the selected value
     act(() => {
       store.dispatch({ type: 'UPDATE_NAME', payload: 'Jane' });
     });
 
-    // Object reference should be the same when unrelated state changes
-    expect(result.current).toBe(initialResult);
+    // Should not trigger a re-render since object reference is the same
+    expect(renderCount).not.toHaveBeenCalled();
+    expect(result.current).toBe(initialSettings);
+
+    // Dispatch an action that changes the selected value
+    act(() => {
+      store.dispatch({ type: 'UPDATE_THEME', payload: 'dark' });
+    });
+
+    // Should trigger a re-render since settings changed
+    expect(renderCount).toHaveBeenCalledTimes(1);
+    expect(result.current).not.toBe(initialSettings);
   });
 });
