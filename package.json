@@ -34,7 +34,17 @@
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit",
     "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test",
-    "prepublishOnly": "npm run validate && npm run build"
+    "prepublishOnly": "npm run validate && npm run build",
+    "check:all": "yarn check:lint && yarn check:format && yarn check:types && yarn check:test",
+    "check:lint": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
+    "check:format": "prettier --check \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" \"*.{js,json,md}\"",
+    "check:types": "tsc --noEmit",
+    "check:test": "jest --coverage",
+    "fix:all": "yarn fix:lint && yarn fix:format",
+    "fix:lint": "eslint \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" --fix",
+    "fix:format": "prettier --write \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" \"*.{js,json,md}\"",
+    "release": "yarn check:all && yarn build && yarn version --patch && yarn publish",
+    "release:dry": "yarn check:all && yarn build && npm pack --dry-run"
   },
   "repository": {
     "type": "git",

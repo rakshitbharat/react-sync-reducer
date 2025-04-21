@@ -46,7 +46,7 @@ export function createSyncStore<S, A>(
   initialState: S
 ): SyncStore<S, A> {
   let state: S = initialState;
-  let listeners: Set<() => void> = new Set();
+  const listeners: Set<() => void> = new Set();
 
   const getState = (): S => {
     return state;
@@ -88,33 +88,28 @@ export function createSyncStore<S, A>(
     // Optionally, notify listeners after reset if needed, though clearing is often sufficient
     // listeners.forEach((listener) => listener());
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('SyncStore reset. Ensure this is intended, often used for testing.');
+      console.warn(
+        'SyncStore reset. Ensure this is intended, often used for testing.'
+      );
     }
   };
 
-
-  // Bind hooks to this specific store instance
-  const instanceUseSyncReducer = () =>
+  // Use custom hooks prefixed with "use" to satisfy React Hooks rules
+  const useReducerState = () =>
     useSyncReducer(subscribe, getState, getServerState, dispatch);
-  const instanceUseSyncSelector = <Selected>(
+
+  const useSelectorState = <Selected>(
     selector: (state: S) => Selected,
     equalityFn?: (a: Selected, b: Selected) => boolean
-  ) =>
-    useSyncSelector(
-      subscribe,
-      getState,
-      getServerState,
-      selector,
-      equalityFn
-    );
+  ) => useSyncSelector(subscribe, getState, getServerState, selector, equalityFn);
 
   return {
     getState,
     dispatch,
     subscribe,
     getServerState,
-    useSyncReducer: instanceUseSyncReducer,
-    useSyncSelector: instanceUseSyncSelector,
+    useSyncReducer: useReducerState,
+    useSyncSelector: useSelectorState,
     reset,
   };
 }
