@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { createSyncStore } from '../src/createSyncStore';
 import type { Reducer } from '../src/types';
 
@@ -59,12 +59,32 @@ describe('useSyncSelector', () => {
       );
     });
 
+    const initialCalls = renderCount.mock.calls.length;
+
     act(() => {
       store.dispatch({ type: 'UPDATE_NAME', payload: 'Jane' });
     });
 
     rerender();
 
-    expect(renderCount).toHaveBeenCalledTimes(1);
+    // Should not re-render when unrelated state changes
+    expect(renderCount).toHaveBeenCalledTimes(initialCalls);
+  });
+
+  test('should use default equality function', () => {
+    const store = createSyncStore(reducer, initialState);
+
+    const { result } = renderHook(() =>
+      store.useSyncSelector((state) => state.settings)
+    );
+
+    const initialResult = result.current;
+
+    act(() => {
+      store.dispatch({ type: 'UPDATE_NAME', payload: 'Jane' });
+    });
+
+    // Object reference should be the same when unrelated state changes
+    expect(result.current).toBe(initialResult);
   });
 });

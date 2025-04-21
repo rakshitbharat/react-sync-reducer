@@ -10,4 +10,8 @@ module.exports = {
       statements: 80,
     },
   },
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
 };

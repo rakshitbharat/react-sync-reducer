@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { createSyncStore } from '../src/createSyncStore';
 import type { Reducer } from '../src/types';
 
@@ -34,6 +34,7 @@ describe('useSyncReducer', () => {
     });
 
     expect(result.current[0]).toEqual({ count: 1 });
+    expect(store.getState()).toEqual({ count: 1 });
   });
 
   test('should maintain dispatch identity', () => {
