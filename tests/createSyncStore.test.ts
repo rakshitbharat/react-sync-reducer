@@ -49,7 +49,8 @@ describe('createSyncStore', () => {
 
   test('should handle errors in reducer', () => {
     const errorStore = createSyncStore<TestState, TestAction>(
-      (state, action) => {
+      (_state, _action) => {
+        // Use underscore prefix for unused params
         throw new Error('Test error');
       },
       initialState
@@ -59,7 +60,6 @@ describe('createSyncStore', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
     errorStore.dispatch({ type: 'INCREMENT' });
-
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });

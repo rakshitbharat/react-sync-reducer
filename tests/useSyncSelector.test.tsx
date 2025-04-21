@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react';
 import { createSyncStore } from '../src/createSyncStore';
 import type { Reducer } from '../src/types';
 
