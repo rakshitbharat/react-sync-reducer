@@ -1,0 +1,16 @@
+{
+  // This config is specifically for building the distributable files
+  // It inherits settings from the base tsconfig.json
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Overrides for build output
+    "noEmit": false, // We *do* want to emit files
+    "declaration": true, // Generate .d.ts files
+    "declarationMap": false, // Optional: source maps for declarations
+    "sourceMap": true, // Generate .map files for JS
+    "outDir": "dist", // Base directory for output (will be overridden by scripts)
+    "isolatedModules": false // Not strictly needed for build output
+  },
+  "include": ["src/**/*"], // Only include source files in the build
+  "exclude": ["node_modules", "dist", "tests"] // Exclude dev dependencies and tests
+}
