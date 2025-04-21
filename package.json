@@ -1,5 +1,5 @@
 {
-  "name": "react-sync-reducer",
+  "name": "react-use-reducer-wth-redux",
   "version": "1.0.0",
   "description": "A React state management utility providing a useReducer-like hook with synchronous state access and selector support, powered by a factory function.",
   "main": "dist/cjs/index.js",

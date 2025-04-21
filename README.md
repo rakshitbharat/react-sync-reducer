@@ -1,6 +1,6 @@
-# react-sync-reducer
+# react-use-reducer-wth-redux
 
-[![npm version](https://badge.fury.io/js/react-sync-reducer.svg)](https://badge.fury.io/js/react-sync-reducer)
+[![npm version](https://badge.fury.io/js/react-use-reducer-wth-redux.svg)](https://badge.fury.io/js/react-use-reducer-wth-redux)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A React state management utility providing a `useReducer`-like hook with synchronous state access and selector support. Uses a factory function (`createSyncStore`) to create isolated state containers.
@@ -15,3 +15,13 @@ A React state management utility providing a `useReducer`-like hook with synchro
 - **TypeScript:** Fully typed for a better developer experience.
 
 ## Installation
+
+```bash
+npm install react-use-reducer-wth-redux
+```
+
+## Usage
+
+```javascript
+import { useReducerWithRedux } from 'react-use-reducer-wth-redux';
+```
