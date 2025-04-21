@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { createSyncStore } from '../src/createSyncStore';
 import { Reducer } from '../src/types';
