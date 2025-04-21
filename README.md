@@ -3,7 +3,85 @@
 [![npm version](https://badge.fury.io/js/react-use-reducer-wth-redux.svg)](https://badge.fury.io/js/react-use-reducer-wth-redux)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A React state management utility providing a `useReducer`-like hook with synchronous state access and selector support. Uses a factory function (`createSyncStore`) to create isolated state containers.
+A synchronous state management solution for React that addresses the limitations of `useReducer`.
+
+## 🤔 The Problem
+
+With React's built-in `useReducer`, you can't access the updated state immediately after dispatching:
+
+```typescript
+// ❌ The Problem with useReducer
+function CounterWithUseReducer() {
+  const [state, dispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'INCREMENT':
+        return { count: state.count + 1 };
+      default:
+        return state;
+    }
+  }, { count: 0 });
+
+  const handleClick = () => {
+    dispatch({ type: 'INCREMENT' });
+    // 😕 state.count is still the old value
+    console.log(state.count); // Logs old value
+    
+    // Common workarounds:
+    // 1. Use useEffect (adds complexity)
+    // 2. Use refs (harder to maintain)
+    // 3. Split into multiple functions (breaks flow)
+  };
+
+  return <button onClick={handleClick}>{state.count}</button>;
+}
+```
+
+## ✨ The Solution
+
+Our package provides immediate state access after dispatch:
+
+```typescript
+// ✅ The Solution with react-use-reducer-wth-redux
+import { createSyncStore } from 'react-use-reducer-wth-redux';
+
+const counterStore = createSyncStore(
+  (state, action) => {
+    switch (action.type) {
+      case 'INCREMENT':
+        return { count: state.count + 1 };
+      default:
+        return state;
+    }
+  },
+  { count: 0 }
+);
+
+function CounterWithSyncStore() {
+  const [state, dispatch] = counterStore.useSyncReducer();
+
+  const handleClick = () => {
+    dispatch({ type: 'INCREMENT' });
+    // ✅ Get updated state immediately!
+    console.log(counterStore.getState().count); // Logs new value
+    
+    // Can use the new state right away
+    if (counterStore.getState().count === 10) {
+      showCelebration();
+    }
+  };
+
+  return <button onClick={handleClick}>{state.count}</button>;
+}
+```
+
+## 🚀 Key Benefits
+
+1. **Synchronous State Access**: No waiting for the next render
+2. **Familiar API**: Works just like `useReducer`
+3. **Type-Safe**: Full TypeScript support
+4. **React 18 Ready**: Built on modern React patterns
+5. **Optimized Renders**: Optional selector support
+6. **SSR Compatible**: Works with Next.js/Remix
 
 ## Features
 
@@ -220,6 +298,40 @@ Creates a new store instance with the following methods:
 - `useSyncReducer(): [State, Dispatch<Action>]` - React hook for full state
 - `useSyncSelector<Selected>(selector, equalityFn?): Selected` - React hook for state selection
 - `reset(): void` - Reset store to initial state
+
+## Detailed Usage Examples
+
+### Standard useReducer Replacement
+
+```typescript
+// Before (with React's useReducer)
+const MyComponent = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  
+  const handleAction = async () => {
+    dispatch({ type: 'START_LOADING' });
+    // ❌ state.loading is still false here
+    const result = await fetchData();
+    dispatch({ type: 'SET_DATA', payload: result });
+  };
+};
+
+// After (with react-use-reducer-wth-redux)
+const store = createSyncStore(reducer, initialState);
+
+const MyComponent = () => {
+  const [state, dispatch] = store.useSyncReducer();
+  
+  const handleAction = async () => {
+    dispatch({ type: 'START_LOADING' });
+    // ✅ Can check loading state immediately
+    if (store.getState().loading) {
+      const result = await fetchData();
+      dispatch({ type: 'SET_DATA', payload: result });
+    }
+  };
+};
+```
 
 ## Examples
 
