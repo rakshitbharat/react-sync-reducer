@@ -1,19 +1,46 @@
-import { useSyncExternalStore } from 'use-sync-external-store/shim'; // Provides React 18+ and shim for older versions
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { useCallback } from 'react';
 
 /**
  * Internal implementation hook used by SyncStore.useSyncReducer.
- * Leverages useSyncExternalStore for safe concurrent rendering integration.
+ * Provides synchronized state management with React's concurrent features.
  *
- * @template S State type.
- * @template A Action type.
+ * @template S The type of the state
+ * @template A The type of actions
  *
- * @param subscribe The store's subscribe function.
- * @param getState The store's getState function.
- * @param getServerState The store's getServerState function (for SSR).
- * @param dispatch The store's dispatch function.
+ * @example
+ * ```typescript
+ * interface State {
+ *   count: number;
+ *   lastUpdated: string;
+ * }
  *
- * @returns A tuple containing the current state and the memoized dispatch function.
+ * type Action = 
+ *   | { type: 'INCREMENT' }
+ *   | { type: 'DECREMENT' }
+ *   | { type: 'RESET' };
+ *
+ * function Counter() {
+ *   const [state, dispatch] = useSyncReducer<State, Action>(
+ *     subscribe,
+ *     getState,
+ *     getServerState,
+ *     dispatch
+ *   );
+ *
+ *   return (
+ *     <div>
+ *       <p>Count: {state.count}</p>
+ *       <button onClick={() => dispatch({ type: 'INCREMENT' })}>+</button>
+ *       <button onClick={() => dispatch({ type: 'DECREMENT' })}>-</button>
+ *       <button onClick={() => dispatch({ type: 'RESET' })}>Reset</button>
+ *       <small>Last updated: {state.lastUpdated}</small>
+ *     </div>
+ *   );
+ * }
+ * ```
+ *
+ * @returns A tuple containing the current state and a stable dispatch function
  */
 export function useSyncReducer<S, A>(
   subscribe: (onStoreChange: () => void) => () => void,
